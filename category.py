@@ -7,15 +7,6 @@ import numpy as np
 
 
 
-def get_database_conn():
-    dotenv.load_dotenv('./.env')
-    db_user_name = os.getenv('DB_USER_NAME')
-    db_password = os.getenv('DB_PASSWORD')
-    db_name = os.getenv('DB_NAME')
-    port = os.getenv('DB_PORT')
-    host = os.getenv('DB_HOST')
-    return create_engine(f'postgresql+psycopg2://{db_user_name}:{db_password}@{host}:{port}/{db_name}')
-
 
 category = {'computing': ['computer-accessories', 'computers', 'software'], 
             'electronics': ['accessories-supplies', 'camera-photo', 'cameras', 'ebook-readers-accessories', 'gps-navigation', 'home-audio', 'office-electronics', 'portable-audio-recorders', 'radios-transceivers', 'security-surveillance', 'television-video', 'wearable-technology'],
@@ -32,10 +23,18 @@ category = {'computing': ['computer-accessories', 'computers', 'software'],
             'baby-products': ['apparel-accessories', 'baby-toddler-toys', 'bathing-skin-care', 'car-seats-accessories', 'diapering', 'feeding', 'gear', 'gifts', 'health-baby-care', 'nursery', 'potty-training', 'safety', 'strollers-accessories'],
             'industrial-scientific': ['additive-manufacturing-products', 'cutting-tools', 'hydraulics-pneumatics-plumbing', 'industrial-electrical', 'industrial-power-hand-tools', 'janitorial-sanitation-supplies', 'lab-scientific-products', 'packaging-shipping-supplies', 'professional-dental-supplies', 'professional-medical-supplies', 'raw-materials', 'retail-store-fixtures-equipment', 'science-education', 'tapes-adhesives-sealants', 'test-measure-inspect']}
 
-# for key, values in category.items():
-#         for value in values:
 
-#             print(key,value)
+
+
+def get_database_conn():
+    dotenv.load_dotenv('./.env')
+    db_user_name = os.getenv('DB_USER_NAME')
+    db_password = os.getenv('DB_PASSWORD')
+    db_name = os.getenv('DB_NAME')
+    port = os.getenv('DB_PORT')
+    host = os.getenv('DB_HOST')
+    return create_engine(f'postgresql+psycopg2://{db_user_name}:{db_password}@{host}:{port}/{db_name}')
+
 
 
 def get_page():
@@ -128,8 +127,8 @@ def transform(path):
     return path
 
     
-def load_to_db():
-    df = pd.read_csv('./raw/cleaned_jumia_products.csv')
+def load_to_db(path):
+    df = pd.read_csv(path)
     engine = get_database_conn()
     db_table_name = 'jumia_products'
     df.to_sql(db_table_name, con=engine, if_exists='replace', index=False)
@@ -138,10 +137,10 @@ def load_to_db():
 
 
 def parent_function():
-    # df = get_page()
-    # path = write_to_local(df)
-    # clean_path = transform(path)
-    load_to_db()
+    df = get_page()
+    path = write_to_local(df)
+    clean_path = transform(path)
+    load_to_db(clean_path)
     
     
 
